@@ -31,7 +31,7 @@
 
 		<p>Now inside the container, install the dependencies.</p>
 
-		<pre># apk add alpine-sdk build-base apk-tools alpine-conf busybox fakeroot xorriso squashfs-tools mtools dosfstools grub-efi</pre>
+		<pre># apk add alpine-sdk build-base apk-tools alpine-conf busybox fakeroot xorriso squashfs-tools mtools dosfstools grub-efi parted</pre>
 
 		<p>Build process should run under unprivileged user, so let's create one.</p>
 
@@ -46,6 +46,10 @@
 		<p>Switch to user build. The rest of the steps are meant to be done under the same user.</p>
 
 		<pre># su - build</pre>
+
+		<p>In order to run programs from sbin directories, update PATH variable.</p>
+
+		<pre>$ export PATH=$PATH:/sbin:/usr/sbin</pre>
 
 		<p>Create signing keys for the user. Make sure the newly generated public key is stored in <code>/etc/apk/keys</code>.</p>
 
