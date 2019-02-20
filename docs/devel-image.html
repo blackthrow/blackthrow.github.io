@@ -9,31 +9,19 @@
 
 		<h2>Prepare Docker container</h2>
 
-		<p>Start by pulling the blackthrow/alpine-devel image.</p>
-
-		<pre>$ docker pull blackthrow/alpine-devel:aarch64</pre>
-
 		<p>Configure binfmt support.</p>
 
 		<pre>$ docker run --rm --privileged multiarch/qemu-user-static:register --reset --credential yes</pre>
 
 		<p>After the container shuts down, all is prepared for us to start the build container.</p>
 
-		<pre>$ docker run -it blackthrow/alpine-devel:aarch64 /bin/sh</pre>
+		<pre>$ docker run -it -u build -w /home/build blackthrow/alpine-devel:aarch64 /bin/sh</pre>
 
 		<p>You should now be seeing command line prompt.</p>
 
 		<h2>Prepare build environment</h2>
 
 		<p><small>This section follows instructions from <a href="https://wiki.alpinelinux.org/wiki/How_to_make_a_custom_ISO_image_with_mkimage">wiki</a>. If stuck, make sure to read the instructions there.</small></p>
-
-		<p>Switch to user build. The rest of the steps are meant to be done under the same user.</p>
-
-		<pre># su - build</pre>
-
-		<p>If profile data are not sourced automatically, we suggest to do it manually. This will add missing <code>/sbin</code> and <code>/usr/sbin</code> directories inside <code>PATH</code>.</p>
-
-		<pre>$ source /etc/profile</pre>
 
 		<p>Bootable image is built using customized mkimage script. The script is a part of <a href="https://github.com/alpinelinux/aports">aports</a> repository. Start by cloning the forked version.</p>
 
