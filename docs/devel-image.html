@@ -9,65 +9,41 @@
 
 		<h2>Prepare Docker container</h2>
 
-		<p>For convenience, build is done inside a Docker container. As a image for the container we use <a href="https://hub.docker.com/r/multiarch/alpine">multiarch/alpine</a>. For purposes of this how-to, we assume you have already installed Docker.</p>
+		<p>Start by pulling the blackthrow/alpine-devel image.</p>
 
-		<p>Start by pulling the multiarch/alpine image. Depending on version of your Raspberry PI, you either want to clone <em>aarch64</em> or <em>armhf</em> flavor of the image.</p>
-
-		<pre>$ docker pull multiarch/alpine:aarch64-edge</pre>
+		<pre>$ docker pull blackthrow/alpine-devel:aarch64</pre>
 
 		<p>Configure binfmt support.</p>
 
 		<pre>$ docker run --rm --privileged multiarch/qemu-user-static:register --reset --credential yes</pre>
 
-		<p>After the container shuts down, all should be ready for us to start our build container.</p>
+		<p>After the container shuts down, all is prepared for us to start the build container.</p>
 
-		<pre>$ docker run -it docker.io/multiarch/alpine:aarch64-edge /bin/sh</pre>
+		<pre>$ docker run -it blackthrow/alpine-devel:aarch64 /bin/sh</pre>
 
-		<p>If everything worked out, you should now be seeing command line prompt.</p>
+		<p>You should now be seeing command line prompt.</p>
 
 		<h2>Prepare build environment</h2>
 
 		<p><small>This section follows instructions from <a href="https://wiki.alpinelinux.org/wiki/How_to_make_a_custom_ISO_image_with_mkimage">wiki</a>. If stuck, make sure to read the instructions there.</small></p>
 
-		<p>Now inside the container, install the dependencies.</p>
-
-		<pre># apk add alpine-sdk build-base apk-tools alpine-conf busybox fakeroot xorriso squashfs-tools mtools dosfstools grub-efi parted</pre>
-
-		<p>Build process should run under unprivileged user, so let's create one.</p>
-
-		<pre># adduser build -G abuild</pre>
-
-		<p>Grant the build user sudo rights, in <code>/etc/sudoers</code> add new line:</p>
-
-		<pre>build ALL=(ALL) NOPASSWD: ALL</pre>
-
-		<p>Now the user build is able to escalate privileges without sudo prompting for password.</p>
-
 		<p>Switch to user build. The rest of the steps are meant to be done under the same user.</p>
 
 		<pre># su - build</pre>
 
-		<p>In order to run programs from sbin directories, update PATH variable.</p>
+		<p>If profile data are not sourced automatically, we suggest to do it manually. This will add missing <code>/sbin</code> and <code>/usr/sbin</code> directories inside <code>PATH</code>.</p>
 
-		<pre>$ export PATH=$PATH:/sbin:/usr/sbin</pre>
+		<pre>$ source /etc/profile</pre>
 
-		<p>Create signing keys for the user. Make sure the newly generated public key is stored in <code>/etc/apk/keys</code>.</p>
+		<p>Bootable image is built using customized mkimage script. The script is a part of <a href="https://github.com/alpinelinux/aports">aports</a> repository. Start by cloning the forked version.</p>
 
-		<pre>$ abuild-keygen -i -a</pre>
-
-		<p>Blackthrow image is built using customized Alpine Linux mkimage script. The script is a part of <a href="https://github.com/alpinelinux/aports">aports</a> repository. Start by cloning our forked version.</p>
-
-		<pre>$ git clone https://github.com/blackthrow/aports</pre>
+		<pre>$ git clone https://github.com/blackthrow/aports -b blackthrow-devel</pre>
 
 		<p>The repository is rather large so be patient while it's being cloned. After the cloning is done, change to the new directory.</p>
 
 		<pre>$ cd aports/scripts/</pre>
 
-		<p>Switch from master branch to blackthrow-devel.</p>
-
-		<pre>$ git checkout blackthrow-devel</pre>
-
-		<p>After that, you should see files with <em>blackthrow</em> in their name. There's also a handy script that will start the build for you.</p>
+		<p>Run the helper script. This will generate an .img file in the same directory.</p>
 
 		<pre>$ sh ./blackthrow_build.sh</pre>
 
